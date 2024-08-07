@@ -4,40 +4,93 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Zar Mendoza's Webpage</title>
-        <style>
-
+    <style>
         body {
-            margin: 0; 
-            padding: 0; 
-            background-color: rgb(65, 130, 255); 
-            font-family: "Georgia", serif; 
-            color: #fff;
-	    text-align: center;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            font-family: 'Arial', sans-serif;
+            color: #333;
         }
 
-        img {
+        header {
+            background-color: #4285f4;
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.5em;
+        }
+
+        nav {
+            background-color: #333;
+            overflow: hidden;
+        }
+
+        nav ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+
+        nav ul li {
+            display: inline;
+            padding: 14px 20px;
+        }
+
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .content {
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 20px;
+            background: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .content img {
             max-width: 100%;
             height: auto;
+            border-radius: 8px;
+            margin-bottom: 20px;
         }
 
-	 ul {
-            list-style: none; /* Remove default list styles (bullet points) */
-            padding: 0;      /* Remove default padding for the list */
+        footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
         }
-
     </style>
 </head>
 <body>
-
-    <h1>Zar Mendoza </h1>
-    <p> I like cheeseburgers, Pokemon, and going from the indoors to the outdoors.</p>
-    <img src="assets/mendozas.jpg" alt="Zar and his family">
-	<hr size="1" />
-	<ul>
-   <li><a href="halfterm/index.html">Three Demo</a></li>
-	<li><a href="phaser/index.html">Phaser 3 Demo</a></li>
-	</ul>	
-
+    <header>
+        <h1>Zar Mendoza</h1>
+    </header>
+    <nav>
+        <ul>
+            <li><a href="halfterm/index.html">Three Demo</a></li>
+            <li><a href="phaser/index.html">Phaser 3 Demo</a></li>
+        </ul>
+    </nav>
+    <div class="content">
+        <p>I like cheeseburgers, Pokemon, and going from the indoors to the outdoors.</p>
+        <img src="assets/mendozas.jpg" alt="Zar and his family">
+    </div>
+    <footer>
+        <p>© 2024 Zar Mendoza</p>
+    </footer>
 </body>
 </html>
-
