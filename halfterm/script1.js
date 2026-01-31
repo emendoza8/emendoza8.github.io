@@ -106,7 +106,7 @@ audioLoader.load('./assets/music/SharonVanEtten-Jupiter4.mp3', function(buffer) 
 		sound.play();
 	});
 });
-const analyser = new THREE.AudioAnalyser(sound, 32);
+const analyser = new THREE.AudioAnalyser(sound, 128);
 
 
 const colorsFolder = gui.addFolder('Colors');
@@ -165,7 +165,6 @@ const cubeRenderTarget = new THREE.WebGLCubeRenderTarget(256, {
 // Create cube camera
 const cubeCamera = new THREE.CubeCamera(near, far, cubeRenderTarget);
 scene.add(cubeCamera);
-scene.add(cubeCamera);
 
 // Set Skybox! Texture as Background
 scene.background = cubeTexture;
@@ -200,7 +199,7 @@ spotLight.position.set( 0, 7.5, 0 );
 spotLight.castShadow = true;
 scene.add( spotLight );
 
-mesh.recieveShadow = true;
+mesh.receiveShadow = true;
 mesh.castShadow = true;
 
 // More textures
@@ -213,24 +212,33 @@ const material = new THREE.MeshStandardMaterial({
     metalness: 1.0,
     roughness: 1.0
 });
+// --- Multi audio-reactive orbiting spheres ---
+const sphereCount = 12;
+const spheres = [];
 
-// Create the torus geometry
-const geometry = new THREE.TorusGeometry(2.25, 0.77, 16, 100);
+const sphereGeometry = new THREE.SphereGeometry(1.0, 24, 24);
+const sphereMaterial = material.clone();
 
-// Torus with added texture
-const torus = new THREE.Mesh(geometry, material);
+for (let i = 0; i < sphereCount; i++) {
+  const m = new THREE.Mesh(sphereGeometry, sphereMaterial.clone());
+  m.castShadow = true;
+  m.receiveShadow = true;
 
-// Set the position of the torus
-torus.position.set(6, 10, -7);
+  spheres.push({
+    mesh: m,
+    orbitRadius: 10 + i * 1.2,
+    orbitSpeed: 0.15 + i * 0.02,
+    phase: (i / sphereCount) * Math.PI * 2,
+    freqBin: i,
+    baseScale: 0.6,
+    scaleBoost: 2.0
+  });
 
-// Add the torus to the scene and shadows
-scene.add(torus);
-torus.recieveShadow = true;
-torus.castShadow = true;
+  scene.add(m);
+}
 
 renderer.setSize( window.innerWidth, window.innerHeight );
 document.body.appendChild( renderer.domElement );
-camera.position.set( 6, 6, -10);
 
 //update orbit controls once outside animation
 controls.update();
@@ -240,16 +248,6 @@ function animate() {
 	uniforms.u_time.value = clock.getElapsedTime();
 	uniforms.u_frequency.value = analyser.getAverageFrequency();
     bloomComposer.render();
-
-    // Update torus position to orbit around the mesh sphere
-    const orbitRadius = 17;
-    const orbitSpeed = 0.22;
-
-    // Calculate the new position of the torus
-    const angle = orbitSpeed * clock.getElapsedTime();
-    const torusX = Math.cos(angle) * orbitRadius;
-    const torusY = Math.sin(angle) * orbitRadius;
-    const torusZ = Math.cos(angle) * orbitRadius * 0.5;
     
     // Update light to follow the same orbit as the torus
     // Future work: Probably should optimize this dupe code
@@ -263,8 +261,28 @@ function animate() {
 
     // Set the new position of the pointlight
     pointLight.position.set(lightX, lightY, lightZ);
-	// Set the new position of the torus
-    torus.position.set(torusX, torusY, torusZ);
+const freqData = analyser.getFrequencyData();
+const bins = freqData.length;
+
+for (let i = 0; i < spheres.length; i++) {
+  const s = spheres[i];
+  const m = s.mesh;
+
+  const a = clock.getElapsedTime() * s.orbitSpeed + s.phase;
+
+  const x = Math.cos(a) * s.orbitRadius;
+  const z = Math.sin(a) * s.orbitRadius;
+  const y = Math.sin(a * 0.7) * 2;
+
+  m.position.set(x, 7 + y, z);
+
+  const binIndex = Math.min(s.freqBin, bins - 1);
+  const amp = freqData[binIndex] / 255;
+  const scale = s.baseScale + amp * s.scaleBoost;
+
+  m.scale.setScalar(scale);
+}
+
     // Orbit controls updates again in here
     controls.update();
 
@@ -272,7 +290,6 @@ function animate() {
     //Don't forget to actually animate! Very important
     requestAnimationFrame( animate );
     // Sure, don't forget to render either
-    renderer.render( scene, camera );
 }
 // Animate outside the loop to fire off the initial animation loop! Yay!
 animate();
